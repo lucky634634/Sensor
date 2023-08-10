@@ -1,9 +1,10 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <Firebase_ESP_Client.h>
-
+#include <time.h>
 const char* ssid = "Thanh Liem";
 const char* password = "Machao1510";
+
 // const float BETA = 3950; // should match the Beta Coefficient of the thermistor
 // const char* serverName = "https://api.telegram.org/bot6266365592:AAEGRWCHLU6Jq14fCv8IpNzKCxEAncwLMww/sendMessage";
 // const char* serverName = "https://testcloud-a615d-default-rtdb.asia-southeast1.firebasedatabase.app/sensors.json";
@@ -17,18 +18,27 @@ const char* password = "Machao1510";
 // Device ID
 #define DEVICE_ID "5935177714"
 
-FirebaseData fbdo;
+// Sensor pin
+#define SENSOR_PIN A0
 
+// Time server
+#define ntpServer "pool.ntp.org"
+#define gmtOffset_sec 7 * 3600
+#define daylightOffset_sec 0
+
+// Initialize Firebase
+FirebaseData fbdo;
 FirebaseAuth auth;
 FirebaseConfig config;
 
 void setupWifi();
 void setupFirebase();
-void SendTemperature(int temp);
+void SendData(int temperature, String time);
+String GetTime();
 
 void setup()
 {
-	Serial.begin(9600);
+	Serial.begin(115200);
 
 	// analogReadResolution(10);
 	setupWifi();
@@ -36,35 +46,36 @@ void setup()
 
 	setupFirebase();
 
-	pinMode(A0, INPUT);
+	// Init and get the time
+	configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+
+	// Set sensor pin
+	pinMode(SENSOR_PIN, INPUT);
 }
 
 void loop()
 {
-	// analogWriteResolution(10);
 	int analogValue = analogRead(A0);
-	// float celsius = 1 / (log(1 / (1023. / analogValue - 1)) / BETA + 1.0 / 298.15) - 273.15;
-	// Serial.println(analogValue);
-	float celsius = ((analogValue / 1023.0) * 5.0 - 0.5) * 100;
-	// float celsius = (analogValue / 1023.f) * 3.3f * 100.f;
-	Serial.print("Temperature: ");
-	Serial.println(celsius);
 
-	SendTemperature(celsius);
+	int celsius = (analogValue / 1023.f) * 5.f * 100.f;
 
-	delay(1000);
+	Serial.printf("[%s] Temperature: %d\n", GetTime().c_str(), celsius);
+
+	SendData(celsius, GetTime());
+
+	delay(5000);
 }
 
 
 inline void setupWifi()
 {
 	WiFi.mode(WIFI_STA); //Optional
-	WiFi.begin(ssid, password);
 	Serial.println("\nConnecting");
+	WiFi.begin(ssid, password);
 	while (WiFi.status() != WL_CONNECTED)
 	{
 		Serial.print(".");
-		delay(100);
+		delay(500);
 	}
 	Serial.println("\nConnected to the WiFi network");
 	Serial.print("Local ESP32 IP: ");
@@ -87,23 +98,24 @@ void setupFirebase()
 
 	Serial.println("Connecting to Firebase:");
 
+	Firebase.begin(&config, &auth);
 	do
 	{
-		Firebase.begin(&config, &auth);
 		Firebase.reconnectWiFi(true);
 		Serial.print(".");
+		delay(500);
 	} while (!Firebase.ready());
 
 	Serial.println("Firebase connected");
 }
 
-inline void SendTemperature(int temp)
+inline void SendData(int temperature, String time)
 {
 	FirebaseJson json;
-	json.add("id", DEVICE_ID);
-	json.add("temperature", temp);
+	json.add("time", time);
+	json.add("temperature", temperature);
 
-	if (Firebase.RTDB.pushJSON(&fbdo, "/test", &json))
+	if (Firebase.RTDB.pushJSON(&fbdo, "/sensors", &json))
 	{
 		Serial.println("Send data to Firebase successfully");
 	}
@@ -112,3 +124,18 @@ inline void SendTemperature(int temp)
 		Serial.printf("%s\n", fbdo.errorReason().c_str());
 	}
 }
+
+inline String GetTime()
+{
+	tm timeinfo;
+	if (!getLocalTime(&timeinfo))
+	{
+		Serial.println("Failed to obtain time");
+		return "";
+	}
+	String time = asctime(&timeinfo);
+	if (time.endsWith("\n"))
+		time = time.substring(0, time.length() - 1);
+	return time;
+}
+

@@ -2,8 +2,14 @@
 #include <ESP8266HTTPClient.h>
 #include <Firebase_ESP_Client.h>
 #include <time.h>
+
+
+// SSID for connecting to the WiFi network
 const char* ssid = "Thanh Liem";
+
+// Password for connecting to the WiFi network
 const char* password = "Machao1510";
+
 
 // const float BETA = 3950; // should match the Beta Coefficient of the thermistor
 // const char* serverName = "https://api.telegram.org/bot6266365592:AAEGRWCHLU6Jq14fCv8IpNzKCxEAncwLMww/sendMessage";
@@ -35,12 +41,12 @@ void setupWifi();
 void setupFirebase();
 void SendData(int temperature, String time);
 String GetTime();
+int ReadTemperatureInCelsius();
 
 void setup()
 {
 	Serial.begin(115200);
 
-	// analogReadResolution(10);
 	setupWifi();
 	delay(500);
 
@@ -55,10 +61,7 @@ void setup()
 
 void loop()
 {
-	int analogValue = analogRead(A0);
-
-	int celsius = (analogValue / 1023.f) * 5.f * 100.f;
-
+	int celsius = ReadTemperatureInCelsius();
 	Serial.printf("[%s] Temperature: %d\n", GetTime().c_str(), celsius);
 
 	SendData(celsius, GetTime());
@@ -66,27 +69,32 @@ void loop()
 	delay(5000);
 }
 
-
-inline void setupWifi()
+// Set up WiFi connection
+void setupWifi()
 {
-	WiFi.mode(WIFI_STA); //Optional
-	Serial.println("\nConnecting");
-	WiFi.begin(ssid, password);
-	while (WiFi.status() != WL_CONNECTED)
+	WiFi.mode(WIFI_STA); // Set the WiFi mode to station mode
+	Serial.println("\nConnecting"); // Print message to indicate connection process
+	WiFi.begin(ssid, password); // Connect to WiFi network using provided SSID and password
+	while (WiFi.status() != WL_CONNECTED) // Wait until WiFi is connected
 	{
-		Serial.print(".");
-		delay(500);
+		Serial.print("."); // Print a dot to indicate waiting
+		delay(500); // Delay for 500 milliseconds
 	}
-	Serial.println("\nConnected to the WiFi network");
-	Serial.print("Local ESP32 IP: ");
-	Serial.println(WiFi.localIP());
+	Serial.println("\nConnected to the WiFi network"); // Print message to indicate successful connection
+	Serial.print("Local ESP32 IP: "); // Print message to indicate local IP address
+	Serial.println(WiFi.localIP()); // Print the local IP address of the ESP32
 }
 
+/**
+ * @brief Set up the Firebase configuration and connect to the Firebase server
+ */
 void setupFirebase()
 {
+	// Set the API key and database URL
 	config.api_key = API_KEY;
 	config.database_url = DATABASE_URL;
 
+	// Sign up with the Firebase configuration
 	if (Firebase.signUp(&config, &auth, "", ""))
 	{
 		Serial.println("Signup successfully");
@@ -98,7 +106,10 @@ void setupFirebase()
 
 	Serial.println("Connecting to Firebase:");
 
+	// Begin the Firebase connection
 	Firebase.begin(&config, &auth);
+
+	// Wait for the Firebase connection to be ready
 	do
 	{
 		Firebase.reconnectWiFi(true);
@@ -109,33 +120,64 @@ void setupFirebase()
 	Serial.println("Firebase connected");
 }
 
+/**
+ * @brief Sends temperature data and time to Firebase database.
+ *
+ * @param temperature The temperature data to send.
+ * @param time The time data to send.
+ */
 inline void SendData(int temperature, String time)
 {
 	FirebaseJson json;
 	json.add("time", time);
 	json.add("temperature", temperature);
 
-	if (Firebase.RTDB.pushJSON(&fbdo, "/sensors", &json))
+	if (Firebase.RTDB.pushJSON(&fbdo, "/sensors", &json)) // Push JSON data to Firebase
 	{
 		Serial.println("Send data to Firebase successfully");
 	}
 	else
 	{
-		Serial.printf("%s\n", fbdo.errorReason().c_str());
+		Serial.printf("%s\n", fbdo.errorReason().c_str()); // Print error message if data sending fails
 	}
 }
 
-inline String GetTime()
+// This function returns the current time as a string.
+// If the time cannot be obtained, it returns an empty string.
+String GetTime()
 {
 	tm timeinfo;
+
+	// Attempt to obtain the local time
 	if (!getLocalTime(&timeinfo))
 	{
 		Serial.println("Failed to obtain time");
 		return "";
 	}
+
+	// Convert the time to a string
 	String time = asctime(&timeinfo);
+
+	// Remove the trailing newline character, if present
 	if (time.endsWith("\n"))
+	{
 		time = time.substring(0, time.length() - 1);
+	}
+
 	return time;
 }
+/**
+ * Read the temperature in Celsius from a sensor.
+ *
+ * @return The temperature in Celsius.
+ */
+inline int readTemperatureInCelsius() {
+	// Read the analog value from the sensor
+	int analogValue = analogRead(SENSOR_PIN);
 
+	// Convert the analog value to temperature in Celsius
+	float voltage = analogValue / 1023.f * 5.f;
+	int temperature = voltage * 100.f;
+
+	return temperature;
+}

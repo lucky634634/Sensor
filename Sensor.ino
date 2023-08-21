@@ -64,9 +64,9 @@ void loop()
 	int celsius = ReadTemperatureInCelsius();
 	Serial.printf("[%s] Temperature: %d\n", GetTime().c_str(), celsius);
 
-	// SendData(celsius, GetTime());
+	SendData(celsius, GetTime());
 
-	delay(5000);
+	delay(10000);
 }
 
 // Set up WiFi connection
@@ -132,7 +132,7 @@ inline void SendData(int temperature, String time)
 	json.add("time", time);
 	json.add("temperature", temperature);
 
-	if (Firebase.RTDB.pushJSON(&fbdo, "/sensors", &json)) // Push JSON data to Firebase
+	if (Firebase.RTDB.pushJSON(&fbdo, "/sensors/21127629", &json)) // Push JSON data to Firebase
 	{
 		Serial.println("Send data to Firebase successfully");
 	}
@@ -158,6 +158,7 @@ String GetTime()
 
 	// Convert the time to a string
 	String time = asctime(&timeinfo);
+	
 
 	// Remove the trailing newline character, if present
 	if (time.endsWith("\n"))

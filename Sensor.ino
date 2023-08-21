@@ -1,14 +1,14 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
-#include <Firebase_ESP_Client.h>
+#include <FirebaseESP8266.h>
 #include <time.h>
 
 
 // SSID for connecting to the WiFi network
-const char* ssid = "Thanh Liem";
+const char* ssid = "HoangPhung";
 
 // Password for connecting to the WiFi network
-const char* password = "Machao1510";
+const char* password = "03922526";
 
 
 // const float BETA = 3950; // should match the Beta Coefficient of the thermistor
@@ -64,7 +64,7 @@ void loop()
 	int celsius = ReadTemperatureInCelsius();
 	Serial.printf("[%s] Temperature: %d\n", GetTime().c_str(), celsius);
 
-	SendData(celsius, GetTime());
+	// SendData(celsius, GetTime());
 
 	delay(5000);
 }
@@ -140,6 +140,7 @@ inline void SendData(int temperature, String time)
 	{
 		Serial.printf("%s\n", fbdo.errorReason().c_str()); // Print error message if data sending fails
 	}
+
 }
 
 // This function returns the current time as a string.
@@ -166,18 +167,16 @@ String GetTime()
 
 	return time;
 }
-/**
- * Read the temperature in Celsius from a sensor.
- *
- * @return The temperature in Celsius.
- */
-inline int readTemperatureInCelsius() {
+inline int ReadTemperatureInCelsius()
+{
 	// Read the analog value from the sensor
 	int analogValue = analogRead(SENSOR_PIN);
 
 	// Convert the analog value to temperature in Celsius
-	float voltage = analogValue / 1023.f * 5.f;
-	int temperature = voltage * 100.f;
+	// float voltage = analogValue / 1023.f * 4.88f;
+	// int temperature = voltage * 100.f;
+	int temperature = ((analogValue / 1023.0f) * 4.88) / 0.01 - 30;
+	// int temperature = (analogValue * 0.4882812);
 
 	return temperature;
 }

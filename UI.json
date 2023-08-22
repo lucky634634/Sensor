@@ -1,0 +1,878 @@
+[
+    {
+        "id": "aab6ebe466eb7d08",
+        "type": "tab",
+        "label": "Flow 5",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "78122819e380c8ce",
+        "type": "http request",
+        "z": "aab6ebe466eb7d08",
+        "name": "",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 550,
+        "y": 580,
+        "wires": [
+            [
+                "e428a944f3105696",
+                "9f10c7a472b9e6e5",
+                "f476ea247e42c1e7",
+                "f6e7801f2bd1c648"
+            ]
+        ]
+    },
+    {
+        "id": "e428a944f3105696",
+        "type": "function",
+        "z": "aab6ebe466eb7d08",
+        "name": "guage Data",
+        "func": "let currentValue=0\nfor (let key in msg.payload)\n{\n    if (msg.payload.hasOwnProperty(key)) {\n        currentValue = msg.payload[key]?.temperature  \n        flow.set(\"currentTemp\", currentValue)\n       }\n}\nmsg.payload = currentValue\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 560,
+        "wires": [
+            [
+                "067052aac9cae043"
+            ]
+        ]
+    },
+    {
+        "id": "a4e9a5e35d9356af",
+        "type": "ui_chart",
+        "z": "aab6ebe466eb7d08",
+        "name": "",
+        "group": "ed37d2e3e9754f6c",
+        "order": 2,
+        "width": "6",
+        "height": "8",
+        "label": "chart",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "bezier",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "100",
+        "removeOlder": "1",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "1",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": true,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1090,
+        "y": 660,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "067052aac9cae043",
+        "type": "ui_gauge",
+        "z": "aab6ebe466eb7d08",
+        "name": "",
+        "group": "995ede94a08e941a",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "gauge",
+        "label": "units",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 1070,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "9f10c7a472b9e6e5",
+        "type": "function",
+        "z": "aab6ebe466eb7d08",
+        "name": "chart Data",
+        "func": "let series = {\n    data: [[]] // Dữ liệu series\n};\n\nfor (let key in msg.payload) {\n    if (msg.payload.hasOwnProperty(key)) {\n        series.data[0].push({\n            \"x\": new Date(msg.payload[key]?.time).getTime()\n        ,\"y\": msg.payload[key]?.temperature || 0})\n    }\n}\n\nmsg.payload = [{\n    \"series\": [\"A\"],\n    \"data\": series.data,\n    \"labels\": [\"\"]\n}]\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 660,
+        "wires": [
+            [
+                "a4e9a5e35d9356af"
+            ]
+        ]
+    },
+    {
+        "id": "627e04ac52aa6d8f",
+        "type": "http request",
+        "z": "aab6ebe466eb7d08",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "Content-Type",
+                "keyValue": "",
+                "valueType": "other",
+                "valueValue": "application/json"
+            },
+            {
+                "keyType": "other",
+                "keyValue": "api-key",
+                "valueType": "other",
+                "valueValue": "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"
+            }
+        ],
+        "x": 870,
+        "y": 880,
+        "wires": [
+            [
+                "ca635fd4c2dd57ae"
+            ]
+        ]
+    },
+    {
+        "id": "0c6087ea0e292bb1",
+        "type": "function",
+        "z": "aab6ebe466eb7d08",
+        "name": "Mail setUp",
+        "func": "const sender = 'tminhkhoa91@gmail.com';\nconst recipient = flow.get(\"Email\")\nconst subject = 'Temperature Warning';\nconst content = 'The temperature is over .' + flow.get(\"currentTemp\");\n\nif(msg.payload)\n{\n    msg.payload=\n    {\n        sender: { name: 'TheDarkRescuers', email: sender },\n        to: [{ email: recipient }],\n        subject: subject,\n        textContent: content,\n    }\n    msg.url =\"https://api.sendinblue.com/v3/smtp/email\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 880,
+        "wires": [
+            [
+                "627e04ac52aa6d8f"
+            ]
+        ]
+    },
+    {
+        "id": "ca635fd4c2dd57ae",
+        "type": "debug",
+        "z": "aab6ebe466eb7d08",
+        "name": "debug 10",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1140,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "9655b20c1f7b50ca",
+        "type": "ui_table",
+        "z": "aab6ebe466eb7d08",
+        "group": "142bfd5daaba6c75",
+        "name": "",
+        "order": 1,
+        "width": "12",
+        "height": "12",
+        "columns": [],
+        "outputs": 0,
+        "cts": false,
+        "x": 1090,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "f476ea247e42c1e7",
+        "type": "function",
+        "z": "aab6ebe466eb7d08",
+        "name": "table Data",
+        "func": "let data=[]\nfor (let key in msg.payload) {\n    if (msg.payload.hasOwnProperty(key)) {\n        data.push({\n            \"Time\": msg.payload[key]?.time\n            , \"Temperature\": msg.payload[key]?.temperature || 0,\n            \"Status\": ((msg.payload[key]?.temperature)>70?\"Warning\":\"Available\")\n        })\n    }\n}\nmsg.payload = data\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 760,
+        "wires": [
+            [
+                "9655b20c1f7b50ca"
+            ]
+        ]
+    },
+    {
+        "id": "64f0485dce6317b0",
+        "type": "ui_switch",
+        "z": "aab6ebe466eb7d08",
+        "name": "",
+        "label": "Send Email",
+        "tooltip": "",
+        "group": "995ede94a08e941a",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "topic",
+        "topicType": "msg",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "mail",
+        "oncolor": "blue",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "mail",
+        "offcolor": "gray",
+        "animate": true,
+        "className": "",
+        "x": 510,
+        "y": 880,
+        "wires": [
+            [
+                "0c6087ea0e292bb1"
+            ]
+        ]
+    },
+    {
+        "id": "e76ba993e45d8508",
+        "type": "function",
+        "z": "aab6ebe466eb7d08",
+        "name": "urlCustom",
+        "func": "var userID = flow.get(\"UserID\")||''\nmsg.url = \"https://testcloud-a615d-default-rtdb.asia-southeast1.firebasedatabase.app/sensors/\" + userID+\".json\"\nmsg.user = userID\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 580,
+        "wires": [
+            [
+                "78122819e380c8ce",
+                "dbf24bd39c5add7c"
+            ]
+        ]
+    },
+    {
+        "id": "f6e7801f2bd1c648",
+        "type": "function",
+        "z": "aab6ebe466eb7d08",
+        "name": "Control DataBase",
+        "func": "const keysArray  = Object.keys(msg.payload)\nmsg.lengh = keysArray.length\nfor (let key in msg.payload) {\n    if (msg.lengh>20)\n    {\n        msg.url = 'https://testcloud-a615d-default-rtdb.asia-southeast1.firebasedatabase.app/sensors/21127629/'+ key +'.json'\n        break\n    }\n    else\n    {\n        msg.url =\"\"\n    }\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 850,
+        "y": 460,
+        "wires": [
+            [
+                "7c381648d46c4f28"
+            ]
+        ]
+    },
+    {
+        "id": "7c381648d46c4f28",
+        "type": "http request",
+        "z": "aab6ebe466eb7d08",
+        "name": "",
+        "method": "DELETE",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1050,
+        "y": 460,
+        "wires": [
+            [
+                "9a19dff9ec8b6133"
+            ]
+        ]
+    },
+    {
+        "id": "9a19dff9ec8b6133",
+        "type": "debug",
+        "z": "aab6ebe466eb7d08",
+        "name": "debug 14",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1220,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "c10345d69497bcaf",
+        "type": "inject",
+        "z": "aab6ebe466eb7d08",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "2",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 580,
+        "wires": [
+            [
+                "e76ba993e45d8508"
+            ]
+        ]
+    },
+    {
+        "id": "dbf24bd39c5add7c",
+        "type": "debug",
+        "z": "aab6ebe466eb7d08",
+        "name": "debug 16",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "url",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 540,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "3dce5d2034f4881d",
+        "type": "inject",
+        "z": "aab6ebe466eb7d08",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "15",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 90,
+        "y": 880,
+        "wires": [
+            [
+                "031d035acf8d5c05"
+            ]
+        ]
+    },
+    {
+        "id": "031d035acf8d5c05",
+        "type": "function",
+        "z": "aab6ebe466eb7d08",
+        "name": "checkTemperature",
+        "func": "var temperature= flow.get(\"currentTemp\")\nvar soLan=flow.get(\"sendMailTime\")||0\nif (temperature > 70 && soLan<2)\n{\n    msg.payload=true\n    soLan+=1\n}\nelse\n{\n    flow.set(\"sendMailTime\",0)\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 880,
+        "wires": [
+            [
+                "64f0485dce6317b0"
+            ]
+        ]
+    },
+    {
+        "id": "f5b1afcad225ad97",
+        "type": "function",
+        "z": "aab6ebe466eb7d08",
+        "name": "start the device",
+        "func": "msg.url =\"https://testcloud-a615d-default-rtdb.asia-southeast1.firebasedatabase.app/control.json\"\nmsg.state=msg.payload\nmsg.payload = \n{\n    \"state\": msg.state\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 960,
+        "wires": [
+            [
+                "ee6277bfda3f0d5f"
+            ]
+        ]
+    },
+    {
+        "id": "ee6277bfda3f0d5f",
+        "type": "http request",
+        "z": "aab6ebe466eb7d08",
+        "name": "",
+        "method": "PUT",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 910,
+        "y": 960,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1f870d38ae840858",
+        "type": "ui_switch",
+        "z": "aab6ebe466eb7d08",
+        "name": "",
+        "label": "Fire Prevent",
+        "tooltip": "",
+        "group": "995ede94a08e941a",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "topic",
+        "topicType": "msg",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "animate": false,
+        "className": "",
+        "x": 510,
+        "y": 960,
+        "wires": [
+            [
+                "f5b1afcad225ad97"
+            ]
+        ]
+    },
+    {
+        "id": "e594204433845865",
+        "type": "inject",
+        "z": "aab6ebe466eb7d08",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "15",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 90,
+        "y": 960,
+        "wires": [
+            [
+                "c31d76495fd68ad2"
+            ]
+        ]
+    },
+    {
+        "id": "c31d76495fd68ad2",
+        "type": "function",
+        "z": "aab6ebe466eb7d08",
+        "name": "checkAlert",
+        "func": "var temperature= flow.get(\"currentTemp\")\nvar soLan=flow.get(\"sendMailTime\")||0\nif (temperature > 70 && soLan<2)\n{\n    msg.payload=true\n}\nelse\n{\n    msg.payload = false\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 270,
+        "y": 960,
+        "wires": [
+            [
+                "1f870d38ae840858"
+            ]
+        ]
+    },
+    {
+        "id": "8a44e46e82ab7a26",
+        "type": "ui_form",
+        "z": "aab6ebe466eb7d08",
+        "name": "",
+        "label": "",
+        "group": "24922a28b40db9d6",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "options": [
+            {
+                "label": "UserName",
+                "value": "username",
+                "type": "text",
+                "required": true,
+                "rows": null
+            },
+            {
+                "label": "Password",
+                "value": "password",
+                "type": "password",
+                "required": true,
+                "rows": null
+            }
+        ],
+        "formValue": {
+            "username": "",
+            "password": ""
+        },
+        "payload": "",
+        "submit": "login",
+        "cancel": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "splitLayout": "",
+        "className": "",
+        "x": 150,
+        "y": 180,
+        "wires": [
+            [
+                "406ccb65892ee985",
+                "c0be2b35772a9eda"
+            ]
+        ]
+    },
+    {
+        "id": "6a65d0733003709f",
+        "type": "debug",
+        "z": "aab6ebe466eb7d08",
+        "name": "debug 17",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 900,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "406ccb65892ee985",
+        "type": "function",
+        "z": "aab6ebe466eb7d08",
+        "name": "getUser",
+        "func": "flow.set(\"Email\", msg.payload.username) \nflow.set(\"passWord\", msg.payload.password)\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "86584c7dcf6af423",
+        "type": "ui_toast",
+        "z": "aab6ebe466eb7d08",
+        "position": "top right",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "className": "",
+        "topic": "",
+        "name": "",
+        "x": 930,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "a83a23df0bd9b4c1",
+        "type": "ui_ui_control",
+        "z": "aab6ebe466eb7d08",
+        "name": "",
+        "events": "all",
+        "x": 900,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c0be2b35772a9eda",
+        "type": "http request",
+        "z": "aab6ebe466eb7d08",
+        "name": "",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://testcloud-a615d-default-rtdb.asia-southeast1.firebasedatabase.app/users.json",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 390,
+        "y": 200,
+        "wires": [
+            [
+                "aba6a80cc8951ada",
+                "4cb41c3dc5213365"
+            ]
+        ]
+    },
+    {
+        "id": "aba6a80cc8951ada",
+        "type": "function",
+        "z": "aab6ebe466eb7d08",
+        "name": "validationAcount",
+        "func": "var email=flow.get(\"Email\")\nvar passWord=flow.get(\"passWord\")\nfor (let key in msg.payload) {\n    if (msg.payload.hasOwnProperty(key)) \n    {\n        if (msg.payload[key].email == email && msg.payload[key].passWord == passWord )\n        {\n            flow.set('UserID', msg.payload[key].userId)\n            msg.payload =\n            {\n                \"tab\":\"TheDarknessFire\"\n            }\n            return msg;\n        }\n    }\n}\nmsg.payload=\"Your account isn't correct\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 120,
+        "wires": [
+            [
+                "a83a23df0bd9b4c1",
+                "86584c7dcf6af423",
+                "6a65d0733003709f"
+            ]
+        ]
+    },
+    {
+        "id": "4cb41c3dc5213365",
+        "type": "debug",
+        "z": "aab6ebe466eb7d08",
+        "name": "debug 18",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "fa102395294d58e2",
+        "type": "inject",
+        "z": "aab6ebe466eb7d08",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 340,
+        "wires": [
+            [
+                "7658f77ebb210cd6"
+            ]
+        ]
+    },
+    {
+        "id": "7658f77ebb210cd6",
+        "type": "function",
+        "z": "aab6ebe466eb7d08",
+        "name": "function 32",
+        "func": "msg.payload={\n    \"tab\":\"login\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 340,
+        "wires": [
+            [
+                "2c243d48156f1b39"
+            ]
+        ]
+    },
+    {
+        "id": "2c243d48156f1b39",
+        "type": "ui_ui_control",
+        "z": "aab6ebe466eb7d08",
+        "name": "",
+        "events": "all",
+        "x": 660,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ed37d2e3e9754f6c",
+        "type": "ui_group",
+        "name": "Chart",
+        "tab": "580314db79ac73ca",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "995ede94a08e941a",
+        "type": "ui_group",
+        "name": "gauge",
+        "tab": "580314db79ac73ca",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "142bfd5daaba6c75",
+        "type": "ui_group",
+        "name": "Table",
+        "tab": "580314db79ac73ca",
+        "order": 3,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "24922a28b40db9d6",
+        "type": "ui_group",
+        "name": "Default",
+        "tab": "a6f84554696cb2d2",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "580314db79ac73ca",
+        "type": "ui_tab",
+        "name": "TheDarknessFire",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": true
+    },
+    {
+        "id": "a6f84554696cb2d2",
+        "type": "ui_tab",
+        "name": "TemperatureAlert",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]

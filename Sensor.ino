@@ -22,7 +22,7 @@ const char* password = "03922526";
 #define DATABASE_URL "https://testcloud-a615d-default-rtdb.asia-southeast1.firebasedatabase.app"
 
 // Device ID
-#define DEVICE_ID "5935177714"
+#define DEVICE_ID "212121212"
 
 // Sensor pin
 #define SENSOR_PIN A0

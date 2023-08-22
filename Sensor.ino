@@ -22,7 +22,7 @@ const char* password = "03922526";
 #define DATABASE_URL "https://testcloud-a615d-default-rtdb.asia-southeast1.firebasedatabase.app"
 
 // Device ID
-#define DEVICE_ID "212121212"
+const String DEVICE_ID = "21127629";
 
 // Sensor pin
 #define SENSOR_PIN A0
@@ -132,7 +132,9 @@ inline void SendData(int temperature, String time)
 	json.add("time", time);
 	json.add("temperature", temperature);
 
-	if (Firebase.RTDB.pushJSON(&fbdo, "/sensors/21127629", &json)) // Push JSON data to Firebase
+	String path = "/sensors/" + DEVICE_ID;
+
+	if (Firebase.RTDB.pushJSON(&fbdo, path, &json)) // Push JSON data to Firebase
 	{
 		Serial.println("Send data to Firebase successfully");
 	}
@@ -158,7 +160,7 @@ String GetTime()
 
 	// Convert the time to a string
 	String time = asctime(&timeinfo);
-	
+
 
 	// Remove the trailing newline character, if present
 	if (time.endsWith("\n"))

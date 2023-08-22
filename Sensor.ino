@@ -10,11 +10,6 @@ const char* ssid = "HoangPhung";
 // Password for connecting to the WiFi network
 const char* password = "03922526";
 
-
-// const float BETA = 3950; // should match the Beta Coefficient of the thermistor
-// const char* serverName = "https://api.telegram.org/bot6266365592:AAEGRWCHLU6Jq14fCv8IpNzKCxEAncwLMww/sendMessage";
-// const char* serverName = "https://testcloud-a615d-default-rtdb.asia-southeast1.firebasedatabase.app/sensors.json";
-
 // Insert Firebase project API Key
 #define API_KEY "AIzaSyA3rxaWh38t8nyIhPy6o6f3LhYkWs5NKrU"
 
@@ -24,6 +19,12 @@ const char* password = "03922526";
 // Device ID
 const String DEVICE_ID = "21127629";
 
+// Initialize Firebase
+FirebaseData fbdo;
+FirebaseAuth auth;
+FirebaseConfig config;
+
+
 // Sensor pin
 #define SENSOR_PIN A0
 
@@ -32,10 +33,6 @@ const String DEVICE_ID = "21127629";
 #define gmtOffset_sec 7 * 3600
 #define daylightOffset_sec 0
 
-// Initialize Firebase
-FirebaseData fbdo;
-FirebaseAuth auth;
-FirebaseConfig config;
 
 void setupWifi();
 void setupFirebase();
@@ -126,7 +123,7 @@ void setupFirebase()
  * @param temperature The temperature data to send.
  * @param time The time data to send.
  */
-inline void SendData(int temperature, String time)
+void SendData(int temperature, String time)
 {
 	FirebaseJson json;
 	json.add("time", time);
@@ -170,16 +167,14 @@ String GetTime()
 
 	return time;
 }
-inline int ReadTemperatureInCelsius()
+int ReadTemperatureInCelsius()
 {
 	// Read the analog value from the sensor
 	int analogValue = analogRead(SENSOR_PIN);
 
 	// Convert the analog value to temperature in Celsius
-	// float voltage = analogValue / 1023.f * 4.88f;
-	// int temperature = voltage * 100.f;
-	int temperature = ((analogValue / 1023.0f) * 4.88) / 0.01 - 30;
-	// int temperature = (analogValue * 0.4882812);
+	int temperature = ((analogValue / 1023.0f) * 4.88) / 0.01;
 
 	return temperature;
 }
+// int temperature = ((analogValue / 1023.0f) * 4.88) / 0.01 - 30;

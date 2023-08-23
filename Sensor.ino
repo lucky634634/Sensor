@@ -5,10 +5,12 @@
 
 
 // SSID for connecting to the WiFi network
-const char* ssid = "HoangPhung";
+// const char* ssid = "HoangPhung";
+const char* ssid = "OPPO A9 2020";
 
 // Password for connecting to the WiFi network
-const char* password = "03922526";
+// const char* password = "03922526";
+const char* password = "looky634";
 
 // Insert Firebase project API Key
 #define API_KEY "AIzaSyA3rxaWh38t8nyIhPy6o6f3LhYkWs5NKrU"
